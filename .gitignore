@@ -1,0 +1,21 @@
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Videos and weights
+*.mp4
+*.avi
+*.mkv
+*.pt
+yolov8n.pt
+
+# Folders
+uploads/
+venv/
+env/
+.env
+
+# Logs and outputs
+*.log
+*.txt
+test_events.txt
