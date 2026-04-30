@@ -110,6 +110,17 @@ function App() {
     return () => clearInterval(interval);
   }, []);
 
+  // ── Load first frame on video selection ──
+  useEffect(() => {
+    if (selectedVideo) {
+      fetch(`${API}/api/load_video`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ video_path: selectedVideo }),
+      }).catch(() => {});
+    }
+  }, [selectedVideo]);
+
   // ── Handlers ──
   const handleStart = () => {
     if (!selectedVideo) return;
@@ -143,12 +154,24 @@ function App() {
   const handleUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+    
+    // Clear input to allow uploading the exact same file again
+    e.target.value = "";
+
     const form = new FormData();
     form.append("video", file);
     const res = await fetch(`${API}/api/upload`, { method: "POST", body: form });
     const data = await res.json();
     if (data.path) {
       setSelectedVideo(data.path);
+      
+      // Force load the new video frame (crucial if the path is the same as before)
+      fetch(`${API}/api/load_video`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ video_path: data.path }),
+      }).catch(() => {});
+
       const vids = await fetch(`${API}/api/videos`).then((r) => r.json());
       setVideos(vids);
     }
