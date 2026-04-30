@@ -247,17 +247,19 @@ def detection_loop():
 
                 if any(v < 0 for v in bbox) or bbox[2] <= bbox[0] or bbox[3] <= bbox[1]:
                     continue
-
-                active_ids.add(track_id)
-                total_unique.add(track_id)
-
-                # ── Check if person centroid is inside zone ──
+                # ── Check if person is inside zone ──
                 cx = (bbox[0] + bbox[2]) / 2
                 cy = (bbox[1] + bbox[3]) / 2
-                in_zone = is_inside_zone((cx, cy), zone_px)
+                bottom_y = bbox[3]
+                
+                # Zone check: use both bottom-center (feet) and exact center for robustness
+                in_zone = is_inside_zone((cx, bottom_y), zone_px) or is_inside_zone((cx, cy), zone_px)
 
                 if not in_zone:
                     engine.clear_alert(track_id)
+                    # Draw a faint box for people outside the zone so the user knows they are detected
+                    x1, y1, x2, y2 = [int(v) for v in bbox]
+                    draw_rounded_rect(frame, (x1, y1), (x2, y2), (100, 100, 100), 1, BOX_RADIUS)
                     continue
 
                 active_ids.add(track_id)
@@ -485,6 +487,41 @@ def list_videos():
         if f.lower().endswith((".mp4", ".avi", ".mov", ".mkv")):
             videos.append({"name": f"(local) {f}", "path": os.path.join(root, f)})
     return jsonify(videos)
+
+
+@app.route("/api/load_video", methods=["POST"])
+def load_video():
+    """Load the first frame of a selected video to display in the UI before starting."""
+    if engine.is_running:
+        return jsonify({"error": "Cannot load video while running"}), 400
+
+    data = request.get_json() or {}
+    video_path = data.get("video_path")
+    if not video_path:
+        return jsonify({"error": "No video selected"}), 400
+
+    engine.video_path = video_path
+
+    is_webcam = str(video_path) == "0" or str(video_path).lower() == "webcam"
+    
+    try:
+        source = 0 if is_webcam else int(video_path)
+    except ValueError:
+        source = video_path
+    
+    cap = cv2.VideoCapture(source)
+    if cap.isOpened():
+        ret, frame = cap.read()
+        if ret:
+            with engine.frame_lock:
+                engine.current_frame = frame
+        cap.release()
+    else:
+        with engine.frame_lock:
+            engine.current_frame = None
+
+    return jsonify({"status": "loaded"})
+
 
 
 @app.route("/api/start", methods=["POST"])
