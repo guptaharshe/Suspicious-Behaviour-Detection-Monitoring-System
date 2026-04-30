@@ -562,6 +562,7 @@ if __name__ == "__main__":
 
     print(f"\n  Suspicious Behavior Detection Server starting on http://localhost:{args.port}")
     print(f"  Video: {engine.video_path or 'None (upload via UI)'}\n")
-
+     
+    port = int(os.environ.get("PORT", 5000))
     socketio.run(app, host="0.0.0.0", port=args.port, debug=False,
                  allow_unsafe_werkzeug=True)
