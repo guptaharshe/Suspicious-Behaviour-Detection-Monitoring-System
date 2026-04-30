@@ -397,6 +397,10 @@ def generate_frames():
         time.sleep(0.03)  # ~30 FPS max
 
 
+@app.route("/")
+def home():
+    return "Backend is running 🚀"
+
 @app.route("/api/video_feed")
 def video_feed():
     """MJPEG video stream endpoint."""
@@ -601,5 +605,5 @@ if __name__ == "__main__":
     print(f"  Video: {engine.video_path or 'None (upload via UI)'}\n")
      
     port = int(os.environ.get("PORT", 5000))
-    socketio.run(app, host="0.0.0.0", port=args.port, debug=False,
+    socketio.run(app, host="0.0.0.0", port=port, debug=False,
                  allow_unsafe_werkzeug=True)
