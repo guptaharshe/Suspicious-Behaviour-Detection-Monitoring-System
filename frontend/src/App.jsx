@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { io } from "socket.io-client";
 import "./App.css";
 
-const API = "http://localhost:5000";
+const API = "https://loitering-backend.onrender.com";
 
 function App() {
   const [events, setEvents] = useState([]);
