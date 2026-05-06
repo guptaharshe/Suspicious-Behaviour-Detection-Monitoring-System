@@ -1,21 +1,34 @@
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
-
-# Videos and weights
-*.mp4
-*.avi
-*.mkv
-*.pt
-yolov8n.pt
-
-# Folders
-uploads/
 venv/
 env/
 .env
 
-# Logs and outputs
+# Video files (large / private)
+*.mp4
+*.avi
+*.mkv
+*.mov
+
+# Model weights (large, downloadable)
+*.pt
+*.onnx
+
+# Uploads folder (user-uploaded content)
+uploads/
+
+# Logs and test outputs
 *.log
-*.txt
 test_events.txt
+test_output.*
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Node (frontend has its own .gitignore, but just in case)
+node_modules/

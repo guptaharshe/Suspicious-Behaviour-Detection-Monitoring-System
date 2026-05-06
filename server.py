@@ -8,6 +8,10 @@ Usage:
     python server.py --video test_video.mp4
 """
 
+# Eventlet monkey-patching MUST happen before any other imports
+import eventlet
+eventlet.monkey_patch()
+
 import os
 import sys
 import time
@@ -28,14 +32,14 @@ from loitering_detector import (
     draw_rounded_rect, draw_label, annotate_frame, draw_hud,
     draw_zone, is_inside_zone,
     COLOR_GREEN, COLOR_RED, COLOR_WHITE, COLOR_BG_DARK,
-    PERSON_CLASS_ID, YOLO_MODEL_NAME
+    PERSON_CLASS_ID, YOLO_MODEL_NAME, BOX_RADIUS
 )
 
 # ── Flask app setup ──────────────────────────────────────────────────────────
 
 app = Flask(__name__)
 CORS(app)
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode="threading")
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode="eventlet")
 
 UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uploads")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
