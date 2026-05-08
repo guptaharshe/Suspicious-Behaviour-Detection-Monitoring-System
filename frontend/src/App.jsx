@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { io } from "socket.io-client";
 import "./App.css";
 
-const API = "https://guptaharshe-loitering-backend.hf.space";
+const API = "https://guptaharshe-behaviour-backend.hf.space";
 
 function App() {
   const [events, setEvents] = useState([]);
